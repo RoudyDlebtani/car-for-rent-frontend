@@ -3,20 +3,23 @@ import { useEffect, useState } from "react";
 import { Routes, Route, Link, useLocation, useNavigate } from "react-router-dom";
 import LoginModal from "./LoginModal";
 import { useAuth } from "./auth";
+import { API_BASE } from "./api";
 import {
   images,
+  heroTabs,
   navLinks,
   vehicleTypes,
   stats,
   dreamSpecs,
   stories,
-  brands,
+  whyUs,
   footerColumns,
 } from "./data";
 import AllCars from "./AllCars";
 import VehicleDetails from "./VehicleDetails";
 import Account from "./Account";
 import InfoPage from "./InfoPage";
+import useInView from "./useInView";
 import {
   Search,
   Arrow,
@@ -28,6 +31,9 @@ import {
   Gear,
   Seat,
   Door,
+  Car,
+  Bolt,
+  Shield,
 } from "./Icons";
 
 const Sparkle = ({ className = "" }) => (
@@ -35,6 +41,17 @@ const Sparkle = ({ className = "" }) => (
     <path d="M50 0c4 28 18 42 46 50-28 8-42 22-46 50-4-28-18-42-46-50 28-8 42-22 46-50z" />
   </svg>
 );
+
+// Wraps a landing section so its content reveals (rise + fade) once it scrolls
+// into view. Used on the Landing page only.
+function Reveal({ as: Tag = "section", className = "", children, ...rest }) {
+  const [ref, inView] = useInView();
+  return (
+    <Tag ref={ref} className={`${className} reveal${inView ? " in-view" : ""}`} {...rest}>
+      {children}
+    </Tag>
+  );
+}
 
 /* ------------------------------ Navbar ------------------------------ */
 export function Navbar() {
@@ -78,6 +95,8 @@ export function Navbar() {
 
 /* ------------------------------- Hero ------------------------------- */
 function Hero() {
+  const [tab, setTab] = useState(0);
+  const active = heroTabs[tab];
   return (
     <section className="hero" id="top">
       <Sparkle className="hero__sparkle" />
@@ -86,28 +105,35 @@ function Hero() {
 
         <div className="searchbar">
           <div className="searchbar__tabs">
-            <button className="tab tab--active">Car</button>
-            <button className="tab">Vans</button>
+            {heroTabs.map((t, i) => (
+              <button
+                key={t.key}
+                className={`tab${i === tab ? " tab--active" : ""}`}
+                onClick={() => setTab(i)}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
           <div className="searchbar__fields">
             <div className="field">
               <span className="field__label">Pickup &amp; Return location</span>
-              <span className="field__value">Dallas, Texas</span>
+              <span className="field__value">{active.location}</span>
             </div>
             <div className="field">
               <span className="field__label">Start</span>
-              <span className="field__value">Oct 16, 10:00 AM</span>
+              <span className="field__value">{active.start}</span>
             </div>
             <div className="field">
               <span className="field__label">Stop</span>
-              <span className="field__value">Oct 18, 5:00 PM</span>
+              <span className="field__value">{active.stop}</span>
             </div>
-            <button className="search-btn" aria-label="Search"><Search /></button>
+            <Link to="/location" className="search-btn" aria-label="Search"><Search /></Link>
           </div>
         </div>
 
         <div className="hero__car">
-          <img src={images.hero} alt="Yellow supercar" />
+          <img key={active.key} src={active.img} alt={active.alt} />
         </div>
       </div>
       <button className="scroll-indicator" aria-label="Scroll down">
@@ -119,8 +145,9 @@ function Hero() {
 
 /* ------------------------------ About ------------------------------- */
 function About() {
+  const [ref, inView] = useInView();
   return (
-    <section className="about container">
+    <section ref={ref} className={`about container${inView ? " in-view" : ""}`}>
       <div className="about__text">
         <h2 className="display">Premium Car<br />Rental</h2>
         <p>
@@ -158,7 +185,7 @@ function About() {
 /* ----------------------------- Vehicles ----------------------------- */
 function Vehicles() {
   return (
-    <section className="vehicles container">
+    <Reveal className="vehicles container">
       <h2 className="display section-title">Wide range of<br />vehicles</h2>
       <div className="vehicle-grid">
         {vehicleTypes.map((v) => (
@@ -177,7 +204,7 @@ function Vehicles() {
           </Link>
         ))}
       </div>
-    </section>
+    </Reveal>
   );
 }
 
@@ -218,7 +245,7 @@ function PhoneMock() {
 
 function Locations() {
   return (
-    <section className="locations container">
+    <Reveal className="locations container">
       <div className="locations__text">
         <h2 className="display">Find cars in<br />your locations</h2>
         <p>
@@ -229,7 +256,7 @@ function Locations() {
           and showcase our unique community identity. The solid lines so agreed
           long-expanding shall who knows we might away they were range hard.
         </p>
-        <button className="btn btn--dark">See locations</button>
+        <Link to="/location" className="btn btn--dark">See locations</Link>
       </div>
       <div className="locations__map">
         <div className="map-grid" aria-hidden="true">
@@ -241,28 +268,81 @@ function Locations() {
         </div>
         <PhoneMock />
       </div>
-    </section>
+    </Reveal>
   );
 }
 
 /* ----------------------------- DreamCar ----------------------------- */
 const specIcons = [Speed, Gear, Seat, Door];
 
+// Three fixed carousel slots; the cars[] array is indexed to match these so the
+// rotation keeps working even after backend images swap in.
+const slotIds = ["a", "b", "c"];
+const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : "");
+const currencySymbols = { USD: "$", EUR: "€", GBP: "£" };
+const priceLabel = (amount, currency) =>
+  `${currencySymbols[currency] || `${currency || ""} `}${Math.round(Number(amount) || 0)}`;
+
+// Offline fallback — the original static images + specs, one per slot.
 const dreamImages = [
-  { key: "dreamLeft", src: images.dreamLeft, alt: "" },
-  { key: "dream", src: images.dream, alt: "Orange Lamborghini Urus" },
-  { key: "dreamRight", src: images.dreamRight, alt: "" },
+  { src: images.dreamLeft, alt: "Yellow convertible" },
+  { src: images.dream, alt: "Orange Lamborghini Urus" },
+  { src: images.dreamRight, alt: "White SUV" },
 ];
+const fallbackCars = slotIds.map((id, i) => ({
+  id,
+  slug: null,
+  src: dreamImages[i].src,
+  alt: dreamImages[i].alt,
+  title: dreamImages[i].alt,
+  dailyRate: 225,
+  currency: "USD",
+  specs: dreamSpecs,
+}));
+
 // Where each position moves to when the carousel rotates.
 const cycleForward = { left: "center", center: "right", right: "left" };
 const cycleBackward = { left: "right", center: "left", right: "center" };
 
 function DreamCar() {
-  const [positions, setPositions] = useState({
-    dreamLeft: "left",
-    dream: "center",
-    dreamRight: "right",
-  });
+  const navigate = useNavigate();
+  const [cars, setCars] = useState(fallbackCars);
+  const [positions, setPositions] = useState({ a: "left", b: "center", c: "right" });
+  const [noCars, setNoCars] = useState(false);
+
+  // Pull the top picks; map each into the shared card shape, padding to 3 from
+  // the static fallback. Mirrors the Stories fetch.
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`${API_BASE}/api/vehicles/featured?limit=3`, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (!json || !json.success || !json.data.length) return; // keep fallback
+        setCars(
+          slotIds.map((id, i) => {
+            const v = json.data[i];
+            if (!v) return fallbackCars[i];
+            return {
+              id,
+              slug: v.slug,
+              src: v.image_url || fallbackCars[i].src,
+              alt: v.title || `${v.make} ${v.model}`,
+              title: v.title || `${v.make} ${v.model}`,
+              dailyRate: v.daily_rate,
+              currency: v.currency,
+              specs: [
+                { label: "Class", value: cap(v.vehicle_class), unit: "" },
+                { label: "Gearbox", value: cap(v.transmission), unit: "" },
+                { label: "Seats", value: v.seats, unit: "" },
+                { label: "Fuel", value: cap(v.fuel_type), unit: "" },
+              ],
+            };
+          })
+        );
+      })
+      .catch(() => {}); // keep the fallback on error/abort
+    return () => controller.abort();
+  }, []);
 
   const rotate = (map) =>
     setPositions((prev) => {
@@ -274,20 +354,29 @@ function DreamCar() {
   const handleClick = (pos) => {
     if (pos === "left") rotate(cycleForward);
     else if (pos === "right") rotate(cycleBackward);
+    else return;
+    setNoCars(false); // a new car is coming to the center
   };
 
+  // The car currently in the center drives the specs, price, and buttons.
+  const centerSlot = slotIds.find((id) => positions[id] === "center");
+  const centered = cars[slotIds.indexOf(centerSlot)] || cars[0];
+
+  const handleDetails = () =>
+    navigate(centered.slug ? `/cars/${centered.slug}` : "/all-cars");
+
   return (
-    <section className="dream">
+    <Reveal className="dream">
       <h2 className="display section-title">Pick your dream<br />car today</h2>
       <div className="dream__stage container">
-        {dreamImages.map((img) => {
-          const pos = positions[img.key];
+        {cars.map((car, i) => {
+          const pos = positions[slotIds[i]];
           return (
             <img
-              key={img.key}
-              src={img.src}
+              key={car.id}
+              src={car.src}
               className={`dream__img dream__img--${pos}`}
-              alt={img.alt}
+              alt={car.alt}
               onClick={() => handleClick(pos)}
             />
           );
@@ -295,7 +384,7 @@ function DreamCar() {
       </div>
 
       <div className="dream__specs container">
-        {dreamSpecs.map((s, i) => {
+        {centered.specs.map((s, i) => {
           const Ic = specIcons[i];
           return (
             <div className="spec" key={s.label}>
@@ -312,26 +401,60 @@ function DreamCar() {
       <div className="dream__price container">
         <div className="price">
           <Tag className="amber-text" />
-          <span className="price__amount display">$225</span>
+          <span className="price__amount display">{priceLabel(centered.dailyRate, centered.currency)}</span>
           <span className="price__unit">/ day</span>
         </div>
         <div className="dream__price-actions">
-          <button className="btn btn--dark">View Details</button>
-          <button className="btn btn--amber">Rent Now</button>
+          <button className="btn btn--dark" onClick={handleDetails}>View Details</button>
+          <button className="btn btn--amber" onClick={() => setNoCars(true)}>Rent Now</button>
+          {noCars && <span className="dream__msg">No Cars Available now</span>}
         </div>
       </div>
-    </section>
+    </Reveal>
   );
 }
 
 /* ------------------------------ Stories ----------------------------- */
+// Trim text to a word boundary near `max` chars, adding an ellipsis.
+function truncate(text, max = 110) {
+  if (!text || text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+}
+
 function Stories() {
+  // Cards come from featured vehicles; the static `stories` array is the offline
+  // fallback and the per-index source for fields the backend can't supply (dates).
+  const [items, setItems] = useState(stories);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`${API_BASE}/api/vehicles/featured?limit=3`, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (!json || !json.success || !json.data.length) return; // keep fallback
+        setItems(
+          json.data.slice(0, 3).map((v, i) => ({
+            key: v.slug || stories[i]?.title,
+            to: `/all-cars?q=${encodeURIComponent(`${v.make} ${v.model}`)}`,
+            title: v.title || `${v.make} ${v.model}`,
+            excerpt: truncate(v.description) || stories[i]?.excerpt,
+            img: v.image_url || stories[i]?.img,
+            day: stories[i]?.day,     // manual — schema has no publish date
+            month: stories[i]?.month, // manual
+          }))
+        );
+      })
+      .catch(() => {}); // keep the fallback on error/abort
+    return () => controller.abort();
+  }, []);
+
   return (
-    <section className="stories container">
+    <Reveal className="stories container">
       <h2 className="display section-title">Stories behind<br />the wheel</h2>
       <div className="story-grid">
-        {stories.map((s) => (
-          <article className="story" key={s.title}>
+        {items.map((s) => (
+          <Link className="story" to={s.to || "/all-cars"} key={s.key || s.title}>
             <div className="story__date">
               <span className="story__day display">{s.day}</span>
               <span className="story__month">{s.month}</span>
@@ -341,78 +464,67 @@ function Stories() {
             <div className="story__img">
               <img src={s.img} alt={s.title} />
             </div>
-          </article>
+          </Link>
         ))}
       </div>
-      <div className="stories__cta">
-        <button className="btn btn--dark">See all stories</button>
-      </div>
-    </section>
+
+    </Reveal>
   );
 }
 
 /* ------------------------------ Brands ------------------------------ */
 function Brands() {
+  // Distinct makes from the backend; the static `brands` list is the offline fallback.
+  const [brandList, setBrandList] = useState([]);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`${API_BASE}/api/vehicles/makes`, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (json && json.success && json.data.length) setBrandList(json.data);
+      })
+      .catch(() => {}); // keep the fallback on error/abort
+    return () => controller.abort();
+  }, []);
+
   return (
-    <section className="brands container">
-      <div className="brand-row">
-        {brands.map((b) => (
-          <span className="brand" key={b}>{b}</span>
-        ))}
+    <Reveal className="brands">
+      <div className="brands__marquee">
+        <div className="brands__track">
+          {[0, 1].map((copy) => (
+            <div className="brands__group" key={copy} aria-hidden={copy === 1 || undefined}>
+              {brandList.map((b) => (
+                <span className="brand" key={b}>{b}</span>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
-    </section>
+    </Reveal>
   );
 }
 
-/* ------------------------------ AppCta ------------------------------ */
-function StoreBadge({ store }) {
-  return (
-    <button className="store-badge">
-      <span className="store-badge__icon">{store === "ios" ? "" : "▶"}</span>
-      <span className="store-badge__text">
-        <small>{store === "ios" ? "Download on the" : "Get it on"}</small>
-        <strong>{store === "ios" ? "App Store" : "Google Play"}</strong>
-      </span>
-    </button>
-  );
-}
+/* ------------------------------ WhyUs ------------------------------ */
+const whyUsIcons = { Car, Bolt, Shield };
 
-function AppCta() {
+function WhyUs() {
   return (
-    <section className="appcta-wrap container">
-      <div className="appcta">
-        <Sparkle className="appcta__sparkle" />
-        <div className="appcta__text">
-          <h2 className="display">Premium Car<br />Rental</h2>
-          <p>Download the app and book your next ride in seconds.</p>
-          <div className="appcta__badges">
-            <StoreBadge store="ios" />
-            <StoreBadge store="android" />
-          </div>
-        </div>
-        <div className="appcta__phone">
-          <div className="phone phone--app">
-            <div className="phone__notch" />
-            <div className="phone__tabs">
-              <span className="phone__tab phone__tab--active">Information</span>
-              <span className="phone__tab">Notification</span>
+    <Reveal className="whyus container">
+      <h2 className="section-title display">{whyUs.title}</h2>
+      <div className="whyus__grid">
+        {whyUs.cards.map((c) => {
+          const Icon = whyUsIcons[c.icon];
+          return (
+            <div className="whyus__card" key={c.title}>
+              <span className="whyus__icon">{Icon && <Icon />}</span>
+              <h3>{c.title}</h3>
+              <p>{c.text}</p>
+              <span className="whyus__stat">{c.stat}</span>
             </div>
-            <div className="phone__card">
-              <span className="phone__dark-label">New car</span>
-              <img src={images.phone} alt="Lamborghini Urus" />
-              <div className="phone__card-row">
-                <strong>Lamborghini Urus</strong>
-                <span className="amber-text">$225</span>
-              </div>
-              <div className="phone__meta">
-                <span><Star className="amber-text" /> 4.9</span>
-                <span>320 km/h</span>
-              </div>
-            </div>
-          </div>
-        </div>
+          );
+        })}
       </div>
-    </section>
+    </Reveal>
   );
 }
 
@@ -421,7 +533,7 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="container">
-        <div className="footer__top">
+        {/* <div className="footer__top">
           <h2 className="display footer__head">
             <Sparkle className="footer__sparkle" />
             Stay up to date on<br />all the latest news.
@@ -430,7 +542,7 @@ export function Footer() {
             <input type="email" placeholder="Your Email" aria-label="Your Email" />
             <button className="newsletter__btn" aria-label="Subscribe"><Arrow /></button>
           </form>
-        </div>
+        </div> */}
 
         <div className="footer__cols">
           {footerColumns.map((c) => (
@@ -475,7 +587,7 @@ function Landing() {
       <DreamCar />
       <Stories />
       <Brands />
-      <AppCta />
+      <WhyUs />
       <Footer />
     </div>
   );

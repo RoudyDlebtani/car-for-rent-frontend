@@ -86,12 +86,16 @@ const VALID_CATEGORIES = CATEGORY_OPTIONS.map((o) => o.value).filter(Boolean);
 export default function AllCars() {
   const [searchParams] = useSearchParams();
 
-  // Seed the category filter from ?category=... (e.g. arriving from the landing page).
+  // Seed filters from the URL (e.g. arriving from the landing page):
+  // ?category=... pre-selects a category, ?q=... pre-fills the search box.
   const [filters, setFilters] = useState(() => {
     const category = searchParams.get("category");
-    return VALID_CATEGORIES.includes(category)
-      ? { ...EMPTY_FILTERS, category }
-      : EMPTY_FILTERS;
+    const q = searchParams.get("q") || "";
+    return {
+      ...EMPTY_FILTERS,
+      q,
+      ...(VALID_CATEGORIES.includes(category) ? { category } : {}),
+    };
   });
   const [vehicles, setVehicles] = useState([]);
   const [cities, setCities] = useState([]);

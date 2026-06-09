@@ -147,7 +147,9 @@
   border-radius: 9px;
   cursor: pointer;
   color: var(--muted);
+  transition: background 0.15s ease, color 0.15s ease;
 }
+.tab:hover { color: var(--ink); }
 .tab--active { background: #f1ece4; color: var(--ink); }
 .searchbar__fields {
   display: grid;
@@ -166,8 +168,13 @@
   z-index: 2;
 }
 .hero__car img {
-  width: min(880px, 100%);
+  width: min(520px, 72%);
   filter: drop-shadow(0 40px 40px rgba(0, 0, 0, 0.35));
+  animation: hero-car-in 0.75s cubic-bezier(0.16, 0.84, 0.3, 1) both;
+}
+@keyframes hero-car-in {
+  from { opacity: 0; transform: translateY(22px) scale(0.94); }
+  to   { opacity: 1; transform: none; }
 }
 /* amber ground band behind the car */
 .hero::after {
@@ -235,6 +242,103 @@
   position: absolute; left: 0; top: 0;
   z-index: 2;
 }
+
+/* About scroll reveal — staggered text + images sliding in from the sides */
+.about__text > * {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.about.in-view .about__text > * { opacity: 1; transform: none; }
+.about.in-view .about__text > *:nth-child(1) { transition-delay: 0.05s; }
+.about.in-view .about__text > *:nth-child(2) { transition-delay: 0.15s; }
+.about.in-view .about__text > *:nth-child(3) { transition-delay: 0.25s; }
+.about.in-view .about__text > *:nth-child(4) { transition-delay: 0.35s; }
+
+.about__img {
+  opacity: 0;
+  will-change: transform;
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+.about__img--small { transform: translateX(-32px); }
+.about__img--big { transform: translateX(32px); }
+.about.in-view .about__img { opacity: 1; transform: none; }
+.about.in-view .about__img--big { transition-delay: 0.12s; }
+.about.in-view .about__img:hover { transform: scale(1.03); }
+
+/* Landing-section scroll reveals — each section has its own distinct motion */
+
+/* Vehicles — heading then grid rise + fade */
+.vehicles.reveal > * {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+.vehicles.reveal.in-view > * { opacity: 1; transform: none; }
+.vehicles.reveal.in-view > *:nth-child(1) { transition-delay: 0.05s; }
+.vehicles.reveal.in-view > *:nth-child(2) { transition-delay: 0.18s; }
+
+/* Locations — split slide: text in from the left, map/phone in from the right */
+.locations.reveal .locations__text { opacity: 0; transform: translateX(-44px); }
+.locations.reveal .locations__map  { opacity: 0; transform: translateX(44px); }
+.locations.reveal .locations__text,
+.locations.reveal .locations__map {
+  transition: opacity 0.7s ease, transform 0.75s cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+.locations.reveal.in-view .locations__text,
+.locations.reveal.in-view .locations__map { opacity: 1; transform: none; }
+.locations.reveal.in-view .locations__map { transition-delay: 0.12s; }
+
+/* DreamCar — heading drops in, car stage zooms, specs & price rise (staggered) */
+.dream.reveal > * {
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.65s cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+.dream.reveal > h2 { transform: translateY(-18px); }
+.dream.reveal .dream__stage { transform: scale(0.9); }
+.dream.reveal .dream__specs { transform: translateY(28px); }
+.dream.reveal .dream__price { transform: translateY(28px); }
+.dream.reveal.in-view > * { opacity: 1; transform: none; }
+.dream.reveal.in-view .dream__stage { transition-delay: 0.10s; }
+.dream.reveal.in-view .dream__specs { transition-delay: 0.24s; }
+.dream.reveal.in-view .dream__price { transition-delay: 0.36s; }
+
+/* Stories — title fades in, then each card rises one-by-one */
+.stories.reveal .section-title {
+  opacity: 0; transform: translateY(-16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.stories.reveal .story {
+  opacity: 0; transform: translateY(36px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+.stories.reveal.in-view .section-title { opacity: 1; transform: none; }
+.stories.reveal.in-view .story { opacity: 1; transform: none; }
+.stories.reveal.in-view .story:nth-child(1) { transition-delay: 0.10s; }
+.stories.reveal.in-view .story:nth-child(2) { transition-delay: 0.24s; }
+.stories.reveal.in-view .story:nth-child(3) { transition-delay: 0.38s; }
+
+/* Brands — marquee fades in out of a blur */
+.brands.reveal .brands__marquee {
+  opacity: 0; filter: blur(7px);
+  transition: opacity 0.8s ease, filter 0.8s ease;
+}
+.brands.reveal.in-view .brands__marquee { opacity: 1; filter: blur(0); }
+
+/* WhyUs — title fades in, then each card rises one-by-one */
+.whyus.reveal .section-title {
+  opacity: 0; transform: translateY(-16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.whyus.reveal .whyus__card {
+  opacity: 0; transform: translateY(36px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+.whyus.reveal.in-view .section-title { opacity: 1; transform: none; }
+.whyus.reveal.in-view .whyus__card { opacity: 1; transform: none; }
+.whyus.reveal.in-view .whyus__card:nth-child(1) { transition-delay: 0.10s; }
+.whyus.reveal.in-view .whyus__card:nth-child(2) { transition-delay: 0.24s; }
+.whyus.reveal.in-view .whyus__card:nth-child(3) { transition-delay: 0.38s; }
 
 /* ----------------------------- vehicles ---------------------------- */
 .section-title {
@@ -381,6 +485,7 @@
   filter: drop-shadow(0 40px 35px rgba(0,0,0,0.35));
   transform: translate(-50%, -50%) scale(1);
   cursor: default;
+  pointer-events: none;   /* let clicks pass through to the side images below */
 }
 /* sides: smaller cropped photos peeking behind the hero */
 .dream__img--left,
@@ -418,11 +523,13 @@
 .price { display: flex; align-items: baseline; gap: 8px; }
 .price__amount { font-size: 1.7rem; }
 .price__unit { font-size: 0.72rem; color: var(--muted); }
-.dream__price-actions { display: flex; gap: 10px; }
+.dream__price-actions { display: flex; gap: 10px; align-items: center; }
+.dream__msg { color: var(--amber); font-weight: 600; font-size: 0.85rem; }
 
 /* ------------------------------ stories ---------------------------- */
 .stories { padding: 90px 0 70px; }
 .story-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.story { display: block; text-decoration: none; color: inherit; }
 .story__date { display: flex; align-items: baseline; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
 .story__day { font-size: 1.7rem; }
 .story__month { font-size: 0.62rem; color: var(--muted); }
@@ -435,9 +542,23 @@
 
 /* ------------------------------ brands ----------------------------- */
 .brands { padding: 30px 0 80px; }
-.brand-row {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 30px;
+.brands__marquee { overflow: hidden; }
+.brands__track {
+  display: flex;
+  width: max-content;
+  animation: brand-scroll 30s linear infinite;
+}
+.brands__marquee:hover .brands__track { animation-play-state: paused; }
+.brands__group {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  padding-right: 60px;   /* keeps spacing uniform across the loop seam */
+  flex-shrink: 0;
+}
+@keyframes brand-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 .brand {
   font-family: "Archivo", serif;
@@ -451,36 +572,80 @@
 }
 .brand:hover { opacity: 1; }
 
-/* ------------------------------ appcta ----------------------------- */
-.appcta-wrap { padding: 30px 0 80px; }
-.appcta {
-  position: relative;
-  background: var(--amber-card);
-  border-radius: 26px;
-  padding: 60px 56px 0;
+/* ---------------------------- how it works --------------------------- */
+.howit { padding: 40px 0 90px; }
+.howit__grid {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 30px;
-  align-items: end;
-  overflow: visible;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
 }
-.appcta__sparkle { position: absolute; right: 300px; bottom: 40px; fill: #14110d; width: 38px; height: 38px; }
-.appcta__text { padding-bottom: 56px; }
-.appcta__text h2 { font-size: clamp(1.8rem, 4vw, 3rem); color: #1a1408; }
-.appcta__text p { color: #4a3c1d; font-size: 0.85rem; margin: 16px 0 26px; }
-.appcta__badges { display: flex; gap: 14px; }
-.store-badge {
-  display: inline-flex; align-items: center; gap: 10px;
-  background: #14110d; color: #fff; border: none; cursor: pointer;
-  border-radius: 12px; padding: 10px 18px;
+.howit__step {
+  position: relative;
+  background: var(--cream-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 34px 26px 28px;
 }
-.store-badge__icon { font-size: 1.1rem; }
-.store-badge__text { display: flex; flex-direction: column; text-align: left; line-height: 1.1; }
-.store-badge__text small { font-size: 0.55rem; opacity: 0.8; }
-.store-badge__text strong { font-size: 0.85rem; }
+.howit__num {
+  font-size: 1.6rem;
+  color: var(--amber);
+  letter-spacing: 0.06em;
+}
+.howit__icon {
+  display: grid; place-items: center;
+  width: 46px; height: 46px;
+  border-radius: 12px;
+  background: var(--dark); color: #fff;
+  margin: 16px 0 18px;
+}
+.howit__step h3 { margin: 0 0 8px; font-size: 1.15rem; }
+.howit__step p { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.7; }
+.howit__cta { display: flex; justify-content: center; margin-top: 40px; }
 
-.appcta__phone { display: flex; justify-content: center; }
-.phone--app { transform: translateY(-36px); margin-bottom: -36px; }
+/* ------------------------------ why us ----------------------------- */
+.whyus { padding: 40px 0 100px; }
+.whyus__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.whyus__card {
+  display: flex;
+  flex-direction: column;
+  background: var(--cream-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.whyus__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 60px -36px rgba(0, 0, 0, 0.4);
+}
+.whyus__icon {
+  display: grid;
+  place-items: center;
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: var(--amber);
+  color: #14110d;
+  margin-bottom: 22px;
+}
+.whyus__card h3 { margin: 0 0 10px; font-size: 1.2rem; }
+.whyus__card p {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.75;
+}
+.whyus__stat {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--amber);
+}
 
 /* ------------------------------ footer ----------------------------- */
 .footer {
@@ -544,8 +709,8 @@
   .dream__img--right { transform: translate(calc(-50% + 150px), -50%); }
   .dream__specs { gap: 28px; flex-wrap: wrap; }
   .dream__price { flex-direction: column; }
-  .appcta { grid-template-columns: 1fr; padding: 40px 28px 0; }
-  .appcta__sparkle { display: none; }
+  .howit__grid { grid-template-columns: 1fr; }
+  .whyus__grid { grid-template-columns: 1fr; }
   .footer__top { grid-template-columns: 1fr; }
   .footer__cols { grid-template-columns: repeat(2, 1fr); }
   .footer__bottom { flex-direction: column; align-items: flex-start; }
@@ -1061,6 +1226,7 @@
 .vd-total em { font-style: normal; }
 .vd-total__row { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
 .vd-total__row strong { font-size: 1.35rem; }
+.vd-total__msg { margin-top: 8px; color: #b23c3c; font-size: 0.85rem; font-weight: 600; }
 
 /* about + features */
 .vd-about {
@@ -1095,6 +1261,10 @@
 @media (prefers-reduced-motion: reduce) {
   .vd-car, .vd-ground, .vd-chip, .vd-card { animation: none !important; }
   .vd-car { opacity: 1; transform: none; filter: drop-shadow(0 26px 28px rgba(20,17,13,0.22)); }
+  .hero__car img { animation: none !important; opacity: 1; transform: none; }
+  .brands__track { animation: none; flex-wrap: wrap; }
+  .about__text > *, .about__img { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .reveal, .reveal * { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
 }
 
 /* ------------------------------ Login modal ------------------------------ */

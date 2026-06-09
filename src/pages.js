@@ -88,7 +88,7 @@ export const pageContent = {
     intro:
       "Questions about a booking or just want to say hello? Our team is here seven days a week.",
     sections: [
-      { heading: "Phone", body: "+1 (555) 012-3456 — daily, 7am to 11pm." },
+   
       { heading: "Email", body: "hello@premiumrental.test — we reply within a few hours." },
       { heading: "Head office", body: "120 Riverside Drive, Suite 400, Metro City." },
       {
@@ -144,6 +144,27 @@ export const pageContent = {
       {
         heading: "Still stuck?",
         body: "Reach our support team any day of the week via the Contact page and we'll sort it out quickly.",
+      },
+    ],
+  },
+
+  location: {
+    title: "Find us",
+    intro:
+      "This is a demo project — the address below is illustrative. Visit us in Austin, call ahead, or book online any time.",
+    sections: [
+      { heading: "Pickup location", body: "1200 Congress Avenue, Suite 300, Austin, TX 78701" },
+      {
+        heading: "Opening hours",
+        body: ["Monday to Friday: 7:00 — 23:00", "Saturday & Sunday: 8:00 — 22:00"],
+      },
+      {
+        heading: "Getting here",
+        body: "Five minutes from downtown Austin with on-site parking. The nearest stop is the Congress Ave transit line.",
+      },
+      {
+        heading: "Questions?",
+        body: "Reach our team any day of the week via the Contact page and we'll help you plan your pickup.",
       },
     ],
   },

@@ -53,6 +53,7 @@ export default function VehicleDetails() {
   const [rateMode, setRateMode] = useState("daily"); // daily | hourly
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [unavailable, setUnavailable] = useState(false);
 
   // Favorite (saved) state.
   const [isSaved, setIsSaved] = useState(false);
@@ -148,7 +149,7 @@ export default function VehicleDetails() {
     const d = (new Date(to) - new Date(from)) / 86400000;
     return d > 0 ? Math.round(d) : 0;
   }, [from, to]);
-  const total = nights > 0 ? nights * dailyRate : dailyRate;
+  const total = (nights > 0 ? nights : 1) * unitRate;
 
   /* ---- non-ok states ---- */
   if (status !== "ok") {
@@ -344,11 +345,11 @@ export default function VehicleDetails() {
               <div className="vd-dates">
                 <label>
                   <small>From</small>
-                  <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+                  <input type="date" value={from} onChange={(e) => { setFrom(e.target.value); setUnavailable(false); }} />
                 </label>
                 <label>
                   <small>To</small>
-                  <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+                  <input type="date" value={to} onChange={(e) => { setTo(e.target.value); setUnavailable(false); }} />
                 </label>
               </div>
             </div>
@@ -356,12 +357,15 @@ export default function VehicleDetails() {
             <div className="vd-total">
               <span>
                 Total Price
-                {nights > 0 && <em> · {nights} night{nights > 1 ? "s" : ""}</em>}
+                {nights > 0 && <em> · {nights} day{nights > 1 ? "s" : ""}</em>}
               </span>
               <div className="vd-total__row">
                 <strong>${total.toLocaleString()}</strong>
-                <button className="btn btn--amber">Rent Now</button>
+                <button className="btn btn--amber" onClick={() => setUnavailable(true)}>Rent Now</button>
               </div>
+              {unavailable && (
+                <p className="vd-total__msg">No Cars Available</p>
+              )}
             </div>
           </div>
         </section>

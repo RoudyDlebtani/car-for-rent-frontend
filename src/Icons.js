@@ -68,4 +68,26 @@ export const Pin = (p) => (
   </svg>
 );
 
+export const Car = (p) => (
+  <svg viewBox="0 0 24 24" width="22" height="22" {...p}>
+    <path d="M3 13l1.8-4.6A2 2 0 0 1 6.7 7h10.6a2 2 0 0 1 1.9 1.4L21 13v5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H6v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    <line x1="3" y1="13" x2="21" y2="13" stroke="currentColor" strokeWidth="1.6" />
+    <circle cx="7.5" cy="16" r="1.1" fill="currentColor" />
+    <circle cx="16.5" cy="16" r="1.1" fill="currentColor" />
+  </svg>
+);
+
+export const Bolt = (p) => (
+  <svg viewBox="0 0 24 24" width="22" height="22" {...p}>
+    <path d="M13 2L4 14h6l-1 8 9-12h-6z" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+  </svg>
+);
+
+export const Shield = (p) => (
+  <svg viewBox="0 0 24 24" width="22" height="22" {...p}>
+    <path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    <polyline points="8.5 12 11 14.5 15.5 9.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 export const iconMap = { Speed, Gear, Seat, Door };

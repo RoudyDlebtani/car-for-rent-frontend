@@ -3,14 +3,70 @@ const u = (id, w = 1200) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
 
 export const images = {
-  hero: u("1605559424843-9e4c228bf1c2", 1500), // yellow Lamborghini
+  hero: u("1612825173281-9a193378527e", 1400), // yellow Lamborghini
   about: u("1592198084033-aade902d1aae", 1200), // red supercar
   range: u("1519641471654-76ce0107ad1b", 1200), // white SUV
   dream: u("1612825173281-9a193378527e", 1400), // orange Lamborghini SUV
   dreamLeft: u("1632245889029-e406faaa34cd", 900), // yellow convertible
   dreamRight: u("1519641471654-76ce0107ad1b", 900), // white SUV
-  phone: u("1605559424843-9e4c228bf1c2", 800), // yellow Lamborghini
+  phone: u("1605559424843-9e4c228bf1c2", 800), // yellow Lamborghini (Locations phone mock)
 };
+
+// Final band — three reasons to rent, shown above the footer.
+export const whyUs = {
+  title: "Why rent with us",
+  cards: [
+    {
+      icon: "Car",
+      title: "Huge fleet, your pick",
+      text: "From city runabouts to supercars — browse a constantly refreshed lineup and grab the exact car for your trip.",
+      stat: "200+ cars · 4 categories",
+    },
+    {
+      icon: "Bolt",
+      title: "Book in minutes",
+      text: "Pick your dates, confirm the price, and reserve instantly. No paperwork, no waiting at the counter.",
+      stat: "Free cancellation",
+    },
+    {
+      icon: "Shield",
+      title: "Covered & supported 24/7",
+      text: "Every rental includes insurance and round-the-clock roadside help, so you're never stranded.",
+      stat: "★ 4.9 from 3,000+ reviews",
+    },
+  ],
+};
+
+// Hero search-bar tabs. Clicking one swaps the hero image + the search fields.
+export const heroTabs = [
+  {
+    key: "car",
+    label: "Car",
+    category: "cars",
+    location: "Dallas, Texas",
+    start: "Oct 16, 10:00 AM",
+    stop: "Oct 18, 5:00 PM",
+    img: images.hero,
+    alt: "Yellow supercar",
+  },
+  {
+    key: "vans",
+    label: "Vans",
+    category: "vans",
+    location: "Austin, Texas",
+    start: "Oct 20, 9:00 AM",
+    stop: "Oct 22, 6:00 PM",
+    img: u("1559416523-140ddc3d238c", 1200),
+    alt: "Cargo van",
+  },
+];
+
+// "How it works" steps shown near the bottom of the landing page.
+export const howSteps = [
+  { title: "Browse the fleet", text: "Filter by type, city, and budget to find the car that fits your trip." },
+  { title: "Book in minutes",  text: "Pick your dates, confirm the price, and reserve instantly — no paperwork." },
+  { title: "Hit the road",     text: "Collect the keys at your pickup point and enjoy the drive. That's it." },
+];
 
 // Center navbar links — each { label, to } points to a real page.
 export const navLinks = [
@@ -68,15 +124,7 @@ export const stories = [
   },
 ];
 
-export const brands = [
-  "Land Rover",
-  "Audi",
-  "Lamborghini",
-  "Ferrari",
-  "BMW",
-  "Honda",
-  "Nissan",
-];
+
 
 // Each link is { label, to } — `to` is a React Router path.
 export const footerColumns = [
@@ -84,7 +132,7 @@ export const footerColumns = [
     title: "Explore",
     links: [
       { label: "All Cars", to: "/all-cars" },
-      { label: "Reviews", to: "/reviews" },
+      { label: "Location", to: "/location" },
       { label: "Blog", to: "/blog" },
     ],
   },
