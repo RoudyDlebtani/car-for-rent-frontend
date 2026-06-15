@@ -605,7 +605,7 @@ function ScrollToTop() {
 
 export default function App() {
 
-  console.log("test")
+
   return (
     <>
       <ScrollToTop />
