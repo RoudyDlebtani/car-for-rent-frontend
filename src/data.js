@@ -76,6 +76,14 @@ export const navLinks = [
   { label: "Contact", to: "/contact" },
 ];
 
+// Offline fallback for the landing brand strip. The live list comes from
+// /api/vehicles/makes; this shows if the API is unreachable so the marquee
+// is never empty.
+export const brands = [
+  "Audi", "BMW", "Ford", "Hyundai", "Jeep", "Kia", "Mercedes-Benz",
+  "Nissan", "Polestar", "Porsche", "Tesla", "Toyota", "Volkswagen",
+];
+
 // `code` matches the category codes the API/AllCars filter expects.
 export const vehicleTypes = [
   { name: "Cars", code: "cars", img: u("1580273916550-e323be2ae537", 900) },

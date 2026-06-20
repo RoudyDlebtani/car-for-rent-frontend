@@ -14,6 +14,7 @@ import {
   stories,
   whyUs,
   footerColumns,
+  brands,
 } from "./data";
 import AllCars from "./AllCars";
 import VehicleDetails from "./VehicleDetails";
@@ -475,7 +476,7 @@ function Stories() {
 /* ------------------------------ Brands ------------------------------ */
 function Brands() {
   // Distinct makes from the backend; the static `brands` list is the offline fallback.
-  const [brandList, setBrandList] = useState([]);
+  const [brandList, setBrandList] = useState(brands);
   useEffect(() => {
     const controller = new AbortController();
     fetch(`${API_BASE}/api/vehicles/makes`, { signal: controller.signal })
@@ -533,17 +534,6 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="container">
-        {/* <div className="footer__top">
-          <h2 className="display footer__head">
-            <Sparkle className="footer__sparkle" />
-            Stay up to date on<br />all the latest news.
-          </h2>
-          <form className="newsletter" onSubmit={(e) => e.preventDefault()}>
-            <input type="email" placeholder="Your Email" aria-label="Your Email" />
-            <button className="newsletter__btn" aria-label="Subscribe"><Arrow /></button>
-          </form>
-        </div> */}
-
         <div className="footer__cols">
           {footerColumns.map((c) => (
             <div className="footer__col" key={c.title}>
@@ -604,8 +594,6 @@ function ScrollToTop() {
 }
 
 export default function App() {
-
-
   return (
     <>
       <ScrollToTop />
